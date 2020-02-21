@@ -6,14 +6,19 @@
     char instructionMatrix[100][100];
     int instrCount = 0;
     void convertbin(int , char*);
+    void convertbin14comp(int, char*, int);
     void convertbincomp(int, char*, int);
     void convertbin6bit(int, char*);
     int pos[] = {6, 11, 16, 21, 26, 31};
 %}
 reg ([0-9]|[12][0-9]|3[01])
+regwithout0 ([1-9]|[12][0-9]|3[01])
 reg6bit ([0-9]|[1-5][0-9]|6[0-3])
+sitwopow14 [+-]?([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-7][0-9]{3}|80[0-9]{2}|81[0-8][0-9]|819[01])|"-8192"
 sitwopow16 [+-]?([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[12][0-9]{4}|3[01][0-9]{3}|32[0-6][0-9]{2}|327[0-5][0-9]|3276[0-7])|"-32768"
 uitwopow16 ([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
+
+
 %%
 
 "add"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
@@ -537,8 +542,709 @@ uitwopow16 ([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]
     instrCount++;
 }
 
+
+"ld"[ ]+{reg}[ ]*,[ ]*{sitwopow14}\({reg}\)[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "111010";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 3;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+    int negativeflag = 0;
+    if(temp[stringctrl] == '-') {
+        negativeflag = 1;
+        stringctrl++;
+    }
+    int count;
+    for(count = 1; count <= 4; count++) {
+        if( temp[stringctrl + count] ==  '(' ){
+            break;
+        }
+    }
+    int n = 0;
+    for(int ctr = 0; ctr < count; ctr++) {
+        n += (temp[stringctrl + ctr] - 48) * (int)(pow(10, count - ctr - 1));
+    }
+    char bin14num[15] = {0};
+
+    if(negativeflag == 1) {
+            convertbin14comp(16384 - n, bin14num, negativeflag);
+    } else {
+            convertbin14comp(n, bin14num, negativeflag);
+    }
+
+    stringctrl = stringctrl + count + 1;
+
+    char binregnum[6] = {0};
+
+    if(temp[stringctrl + 1] ==  ')' ) {
+        convertbin((int)(temp[stringctrl]) - 48, binregnum);
+        stringctrl++;
+    } else{
+        convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+        stringctrl += 2;
+    }
+    strcat(instructionMatrix[instrCount], binregnum);
+    strcat(instructionMatrix[instrCount], bin14num);
+    strcat(instructionMatrix[instrCount], "00\n");
+    puts(instructionMatrix[instrCount]);
+    instrCount++;
+}
+
+
+"lwz"[ ]+{reg}[ ]*,[ ]*{sitwopow16}\({reg}\)[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "100000";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 4;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+    int negativeflag = 0;
+    if(temp[stringctrl] == '-') {
+        negativeflag = 1;
+        stringctrl++;
+    }
+    int count;
+    for(count = 1; count <= 4; count++) {
+        if( temp[stringctrl + count] ==  '(' ){
+            break;
+        }
+    }
+    int n = 0;
+    for(int ctr = 0; ctr < count; ctr++) {
+        n += (temp[stringctrl + ctr] - 48) * (int)(pow(10, count - ctr - 1));
+    }
+    char bin16num[17] = {0};
+
+    if(negativeflag == 1) {
+            convertbincomp(65536 - n, bin16num, negativeflag);
+    } else {
+            convertbincomp(n, bin16num, negativeflag);
+    }
+
+    stringctrl = stringctrl + count + 1;
+
+    char binregnum[6] = {0};
+
+    if(temp[stringctrl + 1] ==  ')' ) {
+        convertbin((int)(temp[stringctrl]) - 48, binregnum);
+        stringctrl++;
+    } else{
+        convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+        stringctrl += 2;
+    }
+    strcat(instructionMatrix[instrCount], binregnum);
+    strcat(instructionMatrix[instrCount], bin16num);
+    strcat(instructionMatrix[instrCount], "\n");
+    puts(instructionMatrix[instrCount]);
+    instrCount++;
+}
+
+
+
+"std"[ ]+{reg}[ ]*,[ ]*{sitwopow14}\({reg}\)[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "111110";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 4;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+    int negativeflag = 0;
+    if(temp[stringctrl] == '-') {
+        negativeflag = 1;
+        stringctrl++;
+    }
+    int count;
+    for(count = 1; count <= 4; count++) {
+        if( temp[stringctrl + count] ==  '(' ){
+            break;
+        }
+    }
+    int n = 0;
+    for(int ctr = 0; ctr < count; ctr++) {
+        n += (temp[stringctrl + ctr] - 48) * (int)(pow(10, count - ctr - 1));
+    }
+    char bin14num[15] = {0};
+
+    if(negativeflag == 1) {
+            convertbin14comp(16384 - n, bin14num, negativeflag);
+    } else {
+            convertbin14comp(n, bin14num, negativeflag);
+    }
+
+    stringctrl = stringctrl + count + 1;
+
+    char binregnum[6] = {0};
+
+    if(temp[stringctrl + 1] ==  ')' ) {
+        convertbin((int)(temp[stringctrl]) - 48, binregnum);
+        stringctrl++;
+    } else{
+        convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+        stringctrl += 2;
+    }
+    strcat(instructionMatrix[instrCount], binregnum);
+    strcat(instructionMatrix[instrCount], bin14num);
+    strcat(instructionMatrix[instrCount], "00\n");
+    puts(instructionMatrix[instrCount]);
+    instrCount++;
+}
+
+
+
+"stw"[ ]+{reg}[ ]*,[ ]*{sitwopow16}\({reg}\)[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "100100";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 4;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+    int negativeflag = 0;
+    if(temp[stringctrl] == '-') {
+        negativeflag = 1;
+        stringctrl++;
+    }
+    int count;
+    for(count = 1; count <= 4; count++) {
+        if( temp[stringctrl + count] ==  '(' ){
+            break;
+        }
+    }
+    int n = 0;
+    for(int ctr = 0; ctr < count; ctr++) {
+        n += (temp[stringctrl + ctr] - 48) * (int)(pow(10, count - ctr - 1));
+    }
+    char bin16num[17] = {0};
+
+    if(negativeflag == 1) {
+            convertbincomp(65536 - n, bin16num, negativeflag);
+    } else {
+            convertbincomp(n, bin16num, negativeflag);
+    }
+
+    stringctrl = stringctrl + count + 1;
+
+    char binregnum[6] = {0};
+
+    if(temp[stringctrl + 1] ==  ')' ) {
+        convertbin((int)(temp[stringctrl]) - 48, binregnum);
+        stringctrl++;
+    } else{
+        convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+        stringctrl += 2;
+    }
+    strcat(instructionMatrix[instrCount], binregnum);
+    strcat(instructionMatrix[instrCount], bin16num);
+    strcat(instructionMatrix[instrCount], "\n");
+    puts(instructionMatrix[instrCount]);
+    instrCount++;
+}
+
+
+
+
+"stwu"[ ]+{reg}[ ]*,[ ]*{sitwopow16}\({regwithout0}\)[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "100101";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 5;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+    int negativeflag = 0;
+    if(temp[stringctrl] == '-') {
+        negativeflag = 1;
+        stringctrl++;
+    }
+    int count;
+    for(count = 1; count <= 4; count++) {
+        if( temp[stringctrl + count] ==  '(' ){
+            break;
+        }
+    }
+    int n = 0;
+    for(int ctr = 0; ctr < count; ctr++) {
+        n += (temp[stringctrl + ctr] - 48) * (int)(pow(10, count - ctr - 1));
+    }
+    char bin16num[17] = {0};
+
+    if(negativeflag == 1) {
+            convertbincomp(65536 - n, bin16num, negativeflag);
+    } else {
+            convertbincomp(n, bin16num, negativeflag);
+    }
+
+    stringctrl = stringctrl + count + 1;
+
+    char binregnum[6] = {0};
+
+    if(temp[stringctrl + 1] ==  ')' ) {
+        convertbin((int)(temp[stringctrl]) - 48, binregnum);
+        stringctrl++;
+    } else{
+        convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+        stringctrl += 2;
+    }
+    strcat(instructionMatrix[instrCount], binregnum);
+    strcat(instructionMatrix[instrCount], bin16num);
+    strcat(instructionMatrix[instrCount], "\n");
+    puts(instructionMatrix[instrCount]);
+    instrCount++;
+}
+
+
+
+"lhz"[ ]+{reg}[ ]*,[ ]*{sitwopow16}\({reg}\)[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "101000";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 4;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+    int negativeflag = 0;
+    if(temp[stringctrl] == '-') {
+        negativeflag = 1;
+        stringctrl++;
+    }
+    int count;
+    for(count = 1; count <= 4; count++) {
+        if( temp[stringctrl + count] ==  '(' ){
+            break;
+        }
+    }
+    int n = 0;
+    for(int ctr = 0; ctr < count; ctr++) {
+        n += (temp[stringctrl + ctr] - 48) * (int)(pow(10, count - ctr - 1));
+    }
+    char bin16num[17] = {0};
+
+    if(negativeflag == 1) {
+            convertbincomp(65536 - n, bin16num, negativeflag);
+    } else {
+            convertbincomp(n, bin16num, negativeflag);
+    }
+
+    stringctrl = stringctrl + count + 1;
+
+    char binregnum[6] = {0};
+
+    if(temp[stringctrl + 1] ==  ')' ) {
+        convertbin((int)(temp[stringctrl]) - 48, binregnum);
+        stringctrl++;
+    } else{
+        convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+        stringctrl += 2;
+    }
+    strcat(instructionMatrix[instrCount], binregnum);
+    strcat(instructionMatrix[instrCount], bin16num);
+    strcat(instructionMatrix[instrCount], "\n");
+    puts(instructionMatrix[instrCount]);
+    instrCount++;
+}
+
+
+
+"lha"[ ]+{reg}[ ]*,[ ]*{sitwopow16}\({reg}\)[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "101010";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 4;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+    int negativeflag = 0;
+    if(temp[stringctrl] == '-') {
+        negativeflag = 1;
+        stringctrl++;
+    }
+    int count;
+    for(count = 1; count <= 4; count++) {
+        if( temp[stringctrl + count] ==  '(' ){
+            break;
+        }
+    }
+    int n = 0;
+    for(int ctr = 0; ctr < count; ctr++) {
+        n += (temp[stringctrl + ctr] - 48) * (int)(pow(10, count - ctr - 1));
+    }
+    char bin16num[17] = {0};
+
+    if(negativeflag == 1) {
+            convertbincomp(65536 - n, bin16num, negativeflag);
+    } else {
+            convertbincomp(n, bin16num, negativeflag);
+    }
+
+    stringctrl = stringctrl + count + 1;
+
+    char binregnum[6] = {0};
+
+    if(temp[stringctrl + 1] ==  ')' ) {
+        convertbin((int)(temp[stringctrl]) - 48, binregnum);
+        stringctrl++;
+    } else{
+        convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+        stringctrl += 2;
+    }
+    strcat(instructionMatrix[instrCount], binregnum);
+    strcat(instructionMatrix[instrCount], bin16num);
+    strcat(instructionMatrix[instrCount], "\n");
+    puts(instructionMatrix[instrCount]);
+    instrCount++;
+}
+
+
+"sth"[ ]+{reg}[ ]*,[ ]*{sitwopow16}\({reg}\)[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "101100";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 4;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+    int negativeflag = 0;
+    if(temp[stringctrl] == '-') {
+        negativeflag = 1;
+        stringctrl++;
+    }
+    int count;
+    for(count = 1; count <= 4; count++) {
+        if( temp[stringctrl + count] ==  '(' ){
+            break;
+        }
+    }
+    int n = 0;
+    for(int ctr = 0; ctr < count; ctr++) {
+        n += (temp[stringctrl + ctr] - 48) * (int)(pow(10, count - ctr - 1));
+    }
+    char bin16num[17] = {0};
+
+    if(negativeflag == 1) {
+            convertbincomp(65536 - n, bin16num, negativeflag);
+    } else {
+            convertbincomp(n, bin16num, negativeflag);
+    }
+
+    stringctrl = stringctrl + count + 1;
+
+    char binregnum[6] = {0};
+
+    if(temp[stringctrl + 1] ==  ')' ) {
+        convertbin((int)(temp[stringctrl]) - 48, binregnum);
+        stringctrl++;
+    } else{
+        convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+        stringctrl += 2;
+    }
+    strcat(instructionMatrix[instrCount], binregnum);
+    strcat(instructionMatrix[instrCount], bin16num);
+    strcat(instructionMatrix[instrCount], "\n");
+    puts(instructionMatrix[instrCount]);
+    instrCount++;
+}
+
+
+
+"lbz"[ ]+{reg}[ ]*,[ ]*{sitwopow16}\({reg}\)[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "100010";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 4;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+    int negativeflag = 0;
+    if(temp[stringctrl] == '-') {
+        negativeflag = 1;
+        stringctrl++;
+    }
+    int count;
+    for(count = 1; count <= 4; count++) {
+        if( temp[stringctrl + count] ==  '(' ){
+            break;
+        }
+    }
+    int n = 0;
+    for(int ctr = 0; ctr < count; ctr++) {
+        n += (temp[stringctrl + ctr] - 48) * (int)(pow(10, count - ctr - 1));
+    }
+    char bin16num[17] = {0};
+
+    if(negativeflag == 1) {
+            convertbincomp(65536 - n, bin16num, negativeflag);
+    } else {
+            convertbincomp(n, bin16num, negativeflag);
+    }
+
+    stringctrl = stringctrl + count + 1;
+
+    char binregnum[6] = {0};
+
+    if(temp[stringctrl + 1] ==  ')' ) {
+        convertbin((int)(temp[stringctrl]) - 48, binregnum);
+        stringctrl++;
+    } else{
+        convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+        stringctrl += 2;
+    }
+    strcat(instructionMatrix[instrCount], binregnum);
+    strcat(instructionMatrix[instrCount], bin16num);
+    strcat(instructionMatrix[instrCount], "\n");
+    puts(instructionMatrix[instrCount]);
+    instrCount++;
+}
+
+
+
+"stb"[ ]+{reg}[ ]*,[ ]*{sitwopow16}\({reg}\)[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "100110";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 4;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+    int negativeflag = 0;
+    if(temp[stringctrl] == '-') {
+        negativeflag = 1;
+        stringctrl++;
+    }
+    int count;
+    for(count = 1; count <= 4; count++) {
+        if( temp[stringctrl + count] ==  '(' ){
+            break;
+        }
+    }
+    int n = 0;
+    for(int ctr = 0; ctr < count; ctr++) {
+        n += (temp[stringctrl + ctr] - 48) * (int)(pow(10, count - ctr - 1));
+    }
+    char bin16num[17] = {0};
+
+    if(negativeflag == 1) {
+            convertbincomp(65536 - n, bin16num, negativeflag);
+    } else {
+            convertbincomp(n, bin16num, negativeflag);
+    }
+
+    stringctrl = stringctrl + count + 1;
+
+    char binregnum[6] = {0};
+
+    if(temp[stringctrl + 1] ==  ')' ) {
+        convertbin((int)(temp[stringctrl]) - 48, binregnum);
+        stringctrl++;
+    } else{
+        convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+        stringctrl += 2;
+    }
+    strcat(instructionMatrix[instrCount], binregnum);
+    strcat(instructionMatrix[instrCount], bin16num);
+    strcat(instructionMatrix[instrCount], "\n");
+    puts(instructionMatrix[instrCount]);
+    instrCount++;
+}
+
+
+
 \n {printf("\nA new line\n");}
-".*"         ;
+.* printf("Syntax error");
+
 %%
 
 int main(int arc, char **argv) {
@@ -592,5 +1298,16 @@ void convertbin6bit(int n, char temp[]) {
     while(i >= 0) {
         temp[i] = '0';
         i--;
+    }
+}
+void convertbin14comp(int n, char temp[], int negativeflag) {
+    int lastdig = negativeflag;
+    int indx = 13;
+    while(n) {
+        temp[indx--] = n % 2 + 48;
+        n = n / 2;
+    }
+    while(indx >= 0) {
+        temp[indx--] = lastdig + 48;          
     }
 }
