@@ -1,0 +1,2 @@
+./linescript.sh $1
+lex mPowAssemb.l && gcc lex.yy.c -lfl -lm && ./a.out $1 < linedet.txt
