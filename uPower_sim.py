@@ -1,4 +1,4 @@
-line = "01111100001000100001001000010100"
+line = ""
 
 #defining the compute table.
 
@@ -10,11 +10,6 @@ register_table = []
 
 for i in range(0,32):
     register_table.append(0)
-
-register_table[2] = -1 * int(pow(2, 66))
-register_table[3] =  1
-
-special_purpose_regs = {pc: 0}
 
 data_table = {}
 
@@ -70,10 +65,25 @@ def beq():
     pass
 
 def load(called = 0):
-    pass
+    ra = (register_table[get_decimal_value(line[11:16])])
+    offset = get_two_complement_number(line[16:])
+    loc = ra + offset
+    mem_int = []
+    for i in data_table.keys():
+        mem_int.append(get_decimal_value(i))
+    if loc in mem_int:
+        loc = bin(loc)
+        loc = loc[2:]
+        register_table[get_decimal_value(line[6:11])] = data_table[loc]
+    else:
+        register_table[get_decimal_value(line[6:11])] = 0  
 
 def store(called = 0):
-    pass 
+    ra = (register_table[get_decimal_value(line[11:16])])
+    offset = get_two_complement_number(line[16:30])
+    loc = ra + offset
+    loc = bin(loc)[2:]
+    data_table[loc] = register_table[get_decimal_value(line[6:11])]
 
 def And():
     register_table[get_decimal_value(line[6:11])] = (register_table[get_decimal_value(line[11:16])] & register_table[get_decimal_value(line[16:21])])
@@ -105,10 +115,10 @@ def Cmp():
 #dictionaries definition.
 
 XO = {266: add, 40: subf}
-X  = {476: Nand, 28: And, 444: Or, 539: SRDW, 27: SLDW, 0: Cmp}
+X  = {476: Nand, 28: And, 444: Or, 539: SRDW, 27: SLDW}
 XS = {}
 
-get_instruction_from_pop = {14:addi}
+get_instruction_from_pop = {14:addi, 58:load, 62: store}
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -140,27 +150,45 @@ def print_register_data():
             print("Reg[",i, "]: ", register_table[i], sep ="", end = "   ")
         print("\n")
 
-compute_instruction()
-print_register_data()
 
 def read_data_file():
     init_data = open('initdata.txt', 'r')
     line_list = init_data.readlines()
     for lin in line_list:
         l = lin.split()
+        print(l)
         addr = l[1]
         type1 = l[2]
         no_of_data = l[3]
         if type1 == '11':
-            data_table[addr] = [l[4:], 1]
+            offset = 1
         elif type1 == '01':
-            data_table[addr] = [l[4:], 4]
+            print("reached heire")
+            offset = 4
+        next_addr = addr
+        for i in range(0,no_of_data):
+            data_table[next_addr] = l[4+i]
+            next_addr = get_decimal_value(addr) + offset
+            next_addr = bin(next_addr)
+            next_addr = next_addr[2:]
 
+    init_data.close()
+
+
+def readtextsect():
+    inittext = open('instrfile.txt', 'r')
+    inslist = inittext.readlines()
+    for ir in inslist:
+        global line
+        line = ir[:32]
+        compute_instruction()
+
+read_data_file()
+print_register_data()
 print(data_table)
-
-
-
-    
+readtextsect()
+print_register_data()
+print(data_table)    
         
 
     
