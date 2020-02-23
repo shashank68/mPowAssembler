@@ -30,7 +30,6 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
 
 %%
 {functname}[ ]*\:[ \n]+ {
-    printf("I am in fuction  %d\n", yylineno);
     int stringctrl = 0;
     char *temp = yytext;
     int count;
@@ -39,19 +38,19 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
             break;
         }
     }
-    int vartype = 0;
+    int labeltype = 0;
     if(dataline > textline) {
         if(yylineno >= textline && yylineno < dataline)
-            vartype = 0;    // func var
+            labeltype = 0;    // func var
         else if(yylineno >= dataline) 
-            vartype = 1;    // data var
+            labeltype = 1;    // data var
     } else {
         if(yylineno >= dataline && yylineno < textline) 
-            vartype = 1;
+            labeltype = 1;
         else if(yylineno >= textline) 
-            vartype = 0; 
+            labeltype = 0; 
     }
-    if(vartype == 0) {
+    if(labeltype == 0) {
         char functionName[count+1];
         for(int cnt = 0; cnt < count; cnt++) {
             functionName[cnt] = temp[stringctrl+cnt];
@@ -67,19 +66,18 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
         puts(funclabels[funclabelcount][1]);
         funclabelcount++;
 
-    } else if(vartype == 1) {
+    } else if(labeltype == 1) {
 
         char varName[count+1];
         for(int cnt = 0; cnt < count; cnt++) {
             varName[cnt] = temp[stringctrl+cnt];
         }
-        varName[count] = 0;                        
+        varName[count] = 0;
         strcpy(varlabels[varlabelcount][0], varName);
 
         char addressInTextSec[17] = {0};
         convertbincomp(varlabelcount * 4, addressInTextSec, 0);
         strcpy(varlabels[varlabelcount][1], addressInTextSec);
-        puts("Its var label");
         puts(varlabels[varlabelcount][1]);
         varlabelcount++;
     }
@@ -87,7 +85,6 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
 
 "add"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
     char* temp = yytext;
-    printf("add no is %d\n", yylineno);
     char* opcode = "011111";
     strcpy(instructionMatrix[instrCount], opcode);
     
@@ -1574,6 +1571,67 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
 }
 
 
+"la"[ ]+{reg}[ ]*,[ ]*{functname}[ \n]+ {
+    char* temp = yytext;
+   
+    char* opcode = "001110";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+    int stringctrl = 3;
+
+    for(int count = 0; count < 1; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+       
+    }
+    strcat(instructionMatrix[instrCount], "00000");
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+
+    int count;
+    for(count = 1; count <= 100; count++) {
+        if( temp[stringctrl + count] ==  ' ' || temp[stringctrl + count] ==  '\n'){
+            break;
+        }
+    }
+    char variableName[count+1];
+    for(int cnt = 0; cnt < count; cnt++) {
+        variableName[cnt] = temp[stringctrl+cnt];
+    }   
+    variableName[count] = 0;
+    puts("1615");
+    puts(variableName);
+    int found  = 0, j;
+    for(j = 0; j < varlabelcount; j++) {
+        if(strncmp( varlabels[j][0], variableName, count) == 0 && variableName[count] == 0 && varlabels[j][0][count] == 0) {
+            found = 1;
+            break;
+        }
+    }
+
+    if(found == 1) {
+        strcat(instructionMatrix[instrCount], varlabels[j][1]);
+        strcat(instructionMatrix[instrCount], "01\n");
+        puts(instructionMatrix[instrCount]);
+        instrCount++;
+    } else {
+        printf("ERROR:  %s is undefined!\n", variableName);
+    }
+}
+
 
 
 #.*\n {
@@ -1581,13 +1639,26 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
 }
 
 \n {
-    printf("\nA new line\n");
+    ;
 }
 
 %%
 
 int main(int arc, char **argv) {
-    scanf("%d %d", &dataline, &textline);
+    FILE* linefile = fopen("linedet.txt", "r");
+    int linecnt = 0;
+    for(char c = getc(linefile); c != EOF; c = getc(linefile)) {
+        if(c == '\n') {
+            linecnt++;
+        }
+    }
+    fclose(linefile);
+    if(linecnt == 2) {
+        scanf("%d %d", &dataline, &textline);
+    } else {
+        puts("ERROR: NO .text or .data directives found!!");
+        return 0;
+    }
     FILE* inputFile = fopen(argv[1], "r");
     yyin = inputFile;
     for(int i = 0; i < 100; i++) {
