@@ -1503,12 +1503,77 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
     }
 }
 
-
-
-
-"bca"[ ]+{functname}[ \n]+ {
+"beq"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{functname}[ \n]+ {
     char* temp = yytext;
    
+    char* opcode = "010011";
+    strcpy(instructionMatrix[instrCount], opcode);
+    
+     int stringctrl = 4;
+
+    for(int count = 0; count < 2; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+    }
+
+    int count;
+    for(count = 1; count <= 100; count++) {
+        if( temp[stringctrl + count] ==  ' ' || temp[stringctrl + count] ==  '\n'){
+            break;
+        }
+    }
+    char functionName[count+1];
+    for(int cnt = 0; cnt < count; cnt++) {
+        functionName[cnt] = temp[stringctrl+cnt];
+    }   
+    functionName[count] = 0;
+    int found  = 0, j;
+    puts(funclabels[0][0]);
+    for(j = 0; j < funclabelcount; j++) {
+        if(strncmp( funclabels[j][0], functionName, count) == 0 && functionName[count] == 0 && funclabels[j][0][count] == 0) {
+            found = 1;
+            break;
+        }
+    }
+
+    if(found == 1) {
+        char addr[15] = {0};
+        int diff = funcaddress[funclabelcount] - (instrCount * 4 + 262144);
+        if(diff >= 0) {
+            convertbin14comp(diff, addr, 0);
+        } else {
+            convertbin14comp(-1*diff, addr, 1);
+        }
+        strcat(instructionMatrix[instrCount], addr);
+        strcat(instructionMatrix[instrCount], "00\n");
+        puts(instructionMatrix[instrCount]);
+        instrCount++;
+    } else {
+        printf("ERROR:  %s is undefined!\n", functionName);
+    }
+}
+
+
+
+
+"bca"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{functname}[ \n]+ {  
+
+    char* temp = yytext;
     char* opcode = "010011";
     strcpy(instructionMatrix[instrCount], opcode);
     
@@ -1612,8 +1677,6 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
         variableName[cnt] = temp[stringctrl+cnt];
     }   
     variableName[count] = 0;
-    puts("1615");
-    puts(variableName);
     int found  = 0, j;
     for(j = 0; j < varlabelcount; j++) {
         if(strncmp( varlabels[j][0], variableName, count) == 0 && variableName[count] == 0 && varlabels[j][0][count] == 0) {
@@ -1624,7 +1687,7 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
 
     if(found == 1) {
         strcat(instructionMatrix[instrCount], varlabels[j][1]);
-        strcat(instructionMatrix[instrCount], "01\n");
+        strcat(instructionMatrix[instrCount], "\n");
         puts(instructionMatrix[instrCount]);
         instrCount++;
     } else {

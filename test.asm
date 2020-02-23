@@ -1,7 +1,9 @@
+.data
+Yf: .word 77 -8 9 17
+X: .word 6 -324
+Y: .asciiz "Hith $  ere"
 
 .text 
-    la 3, X
-
-.data
-X: .word 6
-
+    Z:
+        add 5,6,7
+        bca 31,31,Z
