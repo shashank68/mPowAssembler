@@ -1,2 +1,7 @@
-./linescript.sh $1
-lex firstpass.l && gcc lex.yy.c -lfl -lm && ./a.out $1 < linedet.txt
+cp $1 assem.asm
+./linescript.sh assem.asm 
+lex varpass.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
+./linerem assem.asm
+lex funcpass.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
+lex mPowAssemb.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
+rm assem.asm assem.asm.orig linedet.txt

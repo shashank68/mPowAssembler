@@ -29,59 +29,6 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
 
 
 %%
-{functname}[ ]*\:[ \n]+ {
-    int stringctrl = 0;
-    char *temp = yytext;
-    int count;
-    for(count = 1; count <= 100; count++) {
-        if( temp[stringctrl + count] ==  ' ' || temp[stringctrl + count] == ':' ){
-            break;
-        }
-    }
-    int labeltype = 0;
-    if(dataline > textline) {
-        if(yylineno >= textline && yylineno < dataline)
-            labeltype = 0;    // func var
-        else if(yylineno >= dataline) 
-            labeltype = 1;    // data var
-    } else {
-        if(yylineno >= dataline && yylineno < textline) 
-            labeltype = 1;
-        else if(yylineno >= textline) 
-            labeltype = 0; 
-    }
-    if(labeltype == 0) {
-        char functionName[count+1];
-        for(int cnt = 0; cnt < count; cnt++) {
-            functionName[cnt] = temp[stringctrl+cnt];
-        }
-        functionName[count] = 0;                        
-        strcpy(funclabels[funclabelcount][0], functionName);
-
-        char addressInTextSec[25] = {0};
-        convertbin24bit(instrCount * 4 + 262144, addressInTextSec);
-        strcpy(funclabels[funclabelcount][1], addressInTextSec);
-        funcaddress[funclabelcount] = instrCount * 4 + 262144;
-        puts("its a func label");
-        puts(funclabels[funclabelcount][1]);
-        funclabelcount++;
-
-    } else if(labeltype == 1) {
-
-        char varName[count+1];
-        for(int cnt = 0; cnt < count; cnt++) {
-            varName[cnt] = temp[stringctrl+cnt];
-        }
-        varName[count] = 0;
-        strcpy(varlabels[varlabelcount][0], varName);
-
-        char addressInTextSec[17] = {0};
-        convertbincomp(varlabelcount * 4, addressInTextSec, 0);
-        strcpy(varlabels[varlabelcount][1], addressInTextSec);
-        puts(varlabels[varlabelcount][1]);
-        varlabelcount++;
-    }
-} 
 
 "add"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
     char* temp = yytext;
@@ -1679,6 +1626,9 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
     variableName[count] = 0;
     int found  = 0, j;
     for(j = 0; j < varlabelcount; j++) {
+        puts("HI");
+        puts(varlabels[j][0]);
+        puts(variableName);
         if(strncmp( varlabels[j][0], variableName, count) == 0 && variableName[count] == 0 && varlabels[j][0][count] == 0) {
             found = 1;
             break;
@@ -1724,11 +1674,17 @@ int main(int arc, char **argv) {
     }
     FILE* inputFile = fopen(argv[1], "r");
     yyin = inputFile;
-    for(int i = 0; i < 100; i++) {
-        for(int j = 0; j < 100; j++) {
-            instructionMatrix[i][j] = 0;
-        }
+    
+    FILE* varsymtable = fopen("varsymtab.txt", "r");
+    FILE* funcsymtable = fopen("funcsymtab.txt", "r");
+    for(int i = 0; fscanf(varsymtable, "%s", varlabels[i][0]) != EOF && fscanf(varsymtable, "%s", varlabels[i][1]) != EOF; i++) {
+        varlabelcount = i+1;
     }
+    for(int i = 0; i < 4; i++) {
+        puts(varlabels[i][0]);
+        puts(varlabels[i][1]);
+    }
+
     yylex();
     FILE* instrFp = fopen("instrfile.txt", "w");
     for(int k = 0; k < instrCount; k++) {
@@ -1736,6 +1692,9 @@ int main(int arc, char **argv) {
     }
     fclose(inputFile);
     fclose(instrFp);
+    fclose(varsymtable);
+    fclose(funcsymtable);
+
 }
 
 void convertbin(int n, char temp[]) {
