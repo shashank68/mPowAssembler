@@ -5,7 +5,8 @@
     #include<stdlib.h>
     #include<math.h>
     char varlabels[50][2][17];
-    char vardata[50][20][32];
+    char vardata[50][20][32];  // name|address|type|no of data| all data....
+    // type = 01 for .word type = 02 for .asciiz and 03 for .byte.
     int varlabelcount = 0;
     int datanum[20];
     void convertbin(int , char*);
@@ -93,8 +94,9 @@ labelname ([a-zA-Z_][a-zA-Z0-9_]*)
 } 
 
 
-{labelname}[ ]*\:[ ]+".asciiz"[ ]+\"[a-zA-Z0-9!@#$%^&*()]*\"[ \n] {
-   int stringctrl = 0;
+{labelname}[ ]*\:[ ]+".asciiz"[ ]+\"[a-zA-Z0-9!@#$%^&*() ]*\"[ \n] {
+    puts("found teh sritn");
+    int stringctrl = 0;
     char *temp = yytext;
     int explen = strlen(yytext);
     int count;
@@ -118,11 +120,35 @@ labelname ([a-zA-Z_][a-zA-Z0-9_]*)
     puts(addressInTextSec);
     strcpy(varlabels[varlabelcount][1], addressInTextSec);  // address
     strcpy(vardata[varlabelcount][1], addressInTextSec);
-    strcpy(vardata[varlabelcount][2], "10");    // type of data i.e .asciiz here
-    puts(vardata[varlabelcount][2]);
+    strcpy(vardata[varlabelcount][2], "00000000000000000000000000000010");    // type of data i.e .asciiz here
+    puts(vardata[varlabelcount][1]);
 
     stringctrl += (count + 1);
+
+    while( temp[stringctrl] != '"' && stringctrl <= explen) {
+            stringctrl++;
+    }
+    stringctrl++;
+    for(count = 1; count <= 100 && stringctrl + count <= explen + 1; count++) {
+        if( temp[stringctrl + count] ==  '"' ){
+            break;
+        }
+    }
+    
+    char varName1[count+1];
+    for(int cnt = 0; cnt < count; cnt++) {
+        varName1[cnt] = temp[stringctrl+cnt];
+    }
+    varName1[count] = 0;
+    strcpy(vardata[varlabelcount][4], varName1);
+    puts(vardata[varlabelcount][4]);
+    char bin32num[33] = {0};
+    convertbincomp32(count, bin32num, 0);
+    strcpy(vardata[varlabelcount][3], bin32num);
+    puts(vardata[varlabelcount][3]);
+    lar: varlabelcount++;
 }
+
 
 %%
 

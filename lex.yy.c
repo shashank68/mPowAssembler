@@ -421,8 +421,8 @@ static const YY_CHAR yy_ec[256] =
 
 static const YY_CHAR yy_meta[21] =
     {   0,
-        1,    1,    2,    3,    3,    1,    1,    4,    2,    4,
-        2,    4,    4,    4,    4,    4,    4,    4,    4,    4
+        1,    1,    2,    3,    3,    1,    1,    2,    4,    2,
+        4,    2,    2,    2,    2,    2,    2,    2,    2,    2
     } ;
 
 static const flex_int16_t yy_base[37] =
@@ -430,7 +430,7 @@ static const flex_int16_t yy_base[37] =
         0,    0,   68,   69,   18,   19,   20,   64,   23,   12,
        48,   49,   51,   46,   47,   47,   45,   56,   38,   29,
        54,   48,   31,   33,   69,   38,   50,   40,   39,   43,
-       20,   46,   69,   69,   48,   50
+       20,   46,   69,   69,   48,   51
     } ;
 
 static const flex_int16_t yy_def[37] =
@@ -811,15 +811,15 @@ YY_RULE_SETUP
     }
     varName[count] = 0;
     strcpy(varlabels[varlabelcount][0], varName);
-    strcpy(vardata[varlabelcount][0], varName);
+    strcpy(vardata[varlabelcount][0], varName); // name of label
     puts("40");
     printf("%s :label: %s\n", varlabels[varlabelcount][0], vardata[varlabelcount][0]);
     char addressInTextSec[17] = {0};
     convertbincomp(varlabelcount * 4, addressInTextSec, 0);
     puts(addressInTextSec);
-    strcpy(varlabels[varlabelcount][1], addressInTextSec);
+    strcpy(varlabels[varlabelcount][1], addressInTextSec);  // address
     strcpy(vardata[varlabelcount][1], addressInTextSec);
-    strcpy(vardata[varlabelcount][2], "01");
+    strcpy(vardata[varlabelcount][2], "01");    // type of data i.e .word here
     puts(vardata[varlabelcount][2]);
 
     stringctrl += (count + 1);
@@ -871,16 +871,66 @@ case 2:
 YY_RULE_SETUP
 #line 96 "firstpass.l"
 {
-    puts("found a string");
-    puts(yytext);
+    puts("found teh sritn");
+    int stringctrl = 0;
+    char *temp = yytext;
+    int explen = strlen(yytext);
+    int count;
+    for(count = 1; count <= 100; count++) {
+        if( temp[stringctrl + count] ==  ' ' || temp[stringctrl + count] == ':' ){
+            break;
+        }
+    }
+    
+    char varName[count+1];
+    for(int cnt = 0; cnt < count; cnt++) {
+        varName[cnt] = temp[stringctrl+cnt];
+    }
+    varName[count] = 0;
+    strcpy(varlabels[varlabelcount][0], varName);
+    strcpy(vardata[varlabelcount][0], varName); // name of label
+    puts("40");
+    printf("%s :label: %s\n", varlabels[varlabelcount][0], vardata[varlabelcount][0]);
+    char addressInTextSec[17] = {0};
+    convertbincomp(varlabelcount * 4, addressInTextSec, 0);
+    puts(addressInTextSec);
+    strcpy(varlabels[varlabelcount][1], addressInTextSec);  // address
+    strcpy(vardata[varlabelcount][1], addressInTextSec);
+    strcpy(vardata[varlabelcount][2], "00000000000000000000000000000010");    // type of data i.e .asciiz here
+    puts(vardata[varlabelcount][1]);
+
+    stringctrl += (count + 1);
+
+    while( temp[stringctrl] != '"' && stringctrl <= explen) {
+            stringctrl++;
+    }
+    stringctrl++;
+    for(count = 1; count <= 100 && stringctrl + count <= explen + 1; count++) {
+        if( temp[stringctrl + count] ==  '"' ){
+            break;
+        }
+    }
+    
+    char varName1[count+1];
+    for(int cnt = 0; cnt < count; cnt++) {
+        varName1[cnt] = temp[stringctrl+cnt];
+    }
+    varName1[count] = 0;
+    strcpy(vardata[varlabelcount][4], varName1);
+    puts(vardata[varlabelcount][4]);
+    char bin32num[33] = {0};
+    convertbincomp32(count, bin32num, 0);
+    strcpy(vardata[varlabelcount][3], bin32num);
+    puts(vardata[varlabelcount][3]);
+    lar: varlabelcount++;
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 101 "firstpass.l"
+#line 152 "firstpass.l"
 ECHO;
 	YY_BREAK
-#line 884 "lex.yy.c"
+#line 934 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1897,7 +1947,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 101 "firstpass.l"
+#line 152 "firstpass.l"
 
 
 

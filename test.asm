@@ -1,7 +1,6 @@
 .data
-Yf: .word 77 -8 9 17
-X: .word 6 -324
-Y: .asciiz "Hith $  ere"
+X: .word 5
+Y: .asciiz "Hith ^ere"
 
 .text 
     Z:
