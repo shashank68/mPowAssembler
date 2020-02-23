@@ -150,7 +150,12 @@ def print_register_data():
             print("Reg[",i, "]: ", register_table[i], sep ="", end = "   ")
         print("\n")
 
-
+def print_data_table():
+    print("Data Table Contents:(in decimal)")
+    print()
+    for key in data_table.keys():
+        print("At Memory Location ",key " (in binary) wrt  data segment value stored is: ", data_table[key])
+        
 def read_data_file():
     init_data = open('initdata.txt', 'r')
     line_list = init_data.readlines()
