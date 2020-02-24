@@ -5,3 +5,5 @@ lex varpass.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
 lex funcpass.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
 lex mPowAssemb.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
 rm assem.asm assem.asm.orig linedet.txt
+python3 merge.py
+

@@ -9,7 +9,7 @@ from math import pow
 register_table = []
 
 for i in range(0,32):
-    register_table.append(0)
+    register_table.append('0')
 
 data_table = {}
 
@@ -44,9 +44,8 @@ def check_overflow(value):
 #mini instruction set-----------------------------------------------------------------------------------------------------------------------------------------------------
 
 def add():
-    #print("heit there", type(get_two_complement_number(line[16:])))
-    print('hi' ,type(register_table[get_decimal_value(line[11:16])]))
     register_table[get_decimal_value(line[6:11])] = register_table[get_decimal_value(line[11:16])] + register_table[get_decimal_value(line[16:21])]
+    print("hi",  type(register_table[get_decimal_value(line[6:11])]))
     register_table[get_decimal_value(line[6:11])] = check_overflow(int(register_table[get_decimal_value(line[6:11])]))
 
 def subf():
@@ -55,8 +54,7 @@ def subf():
 
 def addi(called = 0):
     if called == 0:
-        print("heit there", type(get_two_complement_number(line[16:])))
-        print(type(register_table[get_decimal_value(line[11:16])]))
+        print(type(get_two_complement_number(line[16:])))
         register_table[get_decimal_value(line[6:11])] = register_table[get_decimal_value(line[11:16])] + get_two_complement_number(line[16:])
     else:
         register_table[get_decimal_value(line[6:11])] = register_table[get_decimal_value(line[11:16])] - get_two_complement_number(line[16:])
@@ -95,6 +93,9 @@ def And():
 def Or():
     register_table[get_decimal_value(line[6:11])] = (register_table[get_decimal_value(line[11:16])] | register_table[get_decimal_value(line[16:21])])
 
+def Ori():
+    register_table[get_decimal_value(line[6:11])] = register_table[get_decimal_value(line[11:16])] | get_two_complement_number(line[16:])
+
 def SRDW():
     get_binary = bin(register_table[get_decimal_value(line[16:21])])
     get_binary = get_binary[2:]
@@ -111,8 +112,8 @@ def SLDW():
     register_table[get_decimal_value(line[6:11])] = register_table[get_decimal_value(line[11:16])] << get_integer
     register_table[get_decimal_value(line[6:11])] = check_overflow(int(register_table[get_decimal_value(line[6:11])]))
 
-def Cmp():
-    pass
+def Andi():
+    register_table[get_decimal_value(line[6:11])] = register_table[get_decimal_value(line[11:16])] & get_two_complement_number(line[16:])
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -122,7 +123,7 @@ XO = {266: add, 40: subf}
 X  = {476: Nand, 28: And, 444: Or, 539: SRDW, 27: SLDW}
 XS = {}
 
-get_instruction_from_pop = {14:addi, 58:load, 62: store}
+get_instruction_from_pop = {14:addi, 58:load, 62: store, 24:Ori, 28:Andi}
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -158,7 +159,7 @@ def print_data_table():
     print("Data Table Contents:(in decimal)")
     print()
     for key in data_table.keys():
-        print("At Memory Location ",key ," (in binary) wrt  data segment value stored is: ", data_table[key])
+        print("At Memory Location ",key, " (in binary) wrt  data segment value stored is: ", data_table[key])
         
 def read_data_file():
     init_data = open('initdata.txt', 'r')
@@ -172,8 +173,9 @@ def read_data_file():
         if type1 == '11':
             offset = 1
         elif type1 == '01':
-            print("reached heire")
             offset = 4
+        elif type1 == '10':
+            offset = 1
         next_addr = addr
         for i in range(0,no_of_data):
             data_table[next_addr] = l[4+i]
@@ -187,17 +189,33 @@ def read_data_file():
 def readtextsect():
     inittext = open('instrfile.txt', 'r')
     inslist = inittext.readlines()
-    for ir in inslist:
-        global line
-        line = ir[:32]
-        compute_instruction()
+    global line
+    #my code here.
+    inp_step_count = input("Enter the step count")
+    if inp_step_count == 'd':
+        ins_step_count = len(inslist)
+    else:
+        ins_step_count = int(inp_step_count)
+
+    if ins_step_count >= len(inslist):
+        for ir in inslist:
+            line = ir[:32]
+            compute_instruction()
+        inittext.close()
+    else:
+        for ins_count in range(0,ins_step_count):
+            line = inslist[ins_count][:32]
+            print(len(line))
+            compute_instruction()
+        inittext.close()
 
 read_data_file()
 print_register_data()
-print(data_table)
+print_data_table()
 readtextsect()
 print_register_data()
-print(data_table)    
+print_data_table()
+
         
 
     
