@@ -1680,6 +1680,9 @@ int main(int arc, char **argv) {
     for(int i = 0; fscanf(varsymtable, "%s", varlabels[i][0]) != EOF && fscanf(varsymtable, "%s", varlabels[i][1]) != EOF; i++) {
         varlabelcount = i+1;
     }
+     for(int i = 0; fscanf(funcsymtable, "%s", funclabels[i][0]) != EOF && fscanf(funcsymtable, "%s", funclabels[i][1]) != EOF; i++) {
+       funclabelcount = i+1;
+    }
     for(int i = 0; i < 4; i++) {
         puts(varlabels[i][0]);
         puts(varlabels[i][1]);
