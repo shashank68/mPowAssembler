@@ -300,6 +300,34 @@ lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
     instrCount++;
 }
 
+"or"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+    char* temp = yytext;
+
+    char* opcode = "011111";
+    strcpy(instructionMatrix[instrCount], opcode);
+
+    int stringctrl = 3;
+
+    for(int count = 0; count < 3; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    strcat(instructionMatrix[instrCount], "01101111000\n");
+    instrCount++;
+}
+
 "ori"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{uitwopow16}[ \n]+ {
     char* temp = yytext;
 
@@ -405,36 +433,6 @@ lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
 
         instrCount++;
     }
-
-
-"or"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
-    char* temp = yytext;
-
-    char* opcode = "011111";
-    strcpy(instructionMatrix[instrCount], opcode);
-
-    int stringctrl = 3;
-
-    for(int count = 0; count < 3; count++) {
-        int  instrctrl = pos[count];
-        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
-            stringctrl++;
-        }
-        char binregnum[6] = {0};
-
-        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
-            convertbin((int)(temp[stringctrl]) - 48, binregnum);
-            stringctrl++;
-        } else{
-            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
-            stringctrl += 2;
-        }
-        strcat(instructionMatrix[instrCount], binregnum);
-    }
-    strcat(instructionMatrix[instrCount], "01101111000\n");
-    instrCount++;
-}
-
 
 "xorri"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{uitwopow16}[ \n]+ {
         char* temp = yytext;
@@ -1449,7 +1447,6 @@ lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
     strcpy(instructionMatrix[instrCount],opcode);
     instrCount++;
 }
-
 
 "bc"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{functname}[ \n]+ {
     char* temp = yytext;
