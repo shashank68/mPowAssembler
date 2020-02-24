@@ -120,7 +120,6 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
     instrCount++;          
 }
 {labelname}[ ]*\:[ \n]+ {
-    puts("i have found one.");
     int stringctrl = 0;
     char *temp = yytext;
     int explen = strlen(yytext);
@@ -138,10 +137,8 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
     varName[count] = 0;
     strcpy(functlabels[functlabelcount][0], varName);
     strcpy(vardata[functlabelcount][0], varName); // name of label
-    printf("%s :label: %s\n", functlabels[functlabelcount][0], vardata[functlabelcount][0]);
     char addressInTextSec[17] = {0};
     convertbincomp(functlabelcount * 4, addressInTextSec, 0);
-    puts(addressInTextSec);
     strcpy(functlabels[functlabelcount][1], addressInTextSec);  // address
     strcpy(vardata[functlabelcount][1], addressInTextSec);
 
