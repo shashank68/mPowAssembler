@@ -1,0 +1,17 @@
+cp $1 assem.asm
+./src/linescript.sh assem.asm 
+./src/varlabelgen assem.asm < linedet.txt
+./src/linerem assem.asm
+./src/funclabelgen assem.asm < linedet.txt
+./src/assembler assem.asm < linedet.txt
+
+rm assem.asm assem.asm.orig linedet.txt
+
+wc -l instrfile.txt | cut -f1 -d" " > sizedata.txt
+wc -l initdata.txt | cut -f1 -d" " >> sizedata.txt
+wc -l funcsymtab.txt | cut -f1 -d" " >> sizedata.txt
+wc -l varsymtab.txt | cut -f1 -d" " >> sizedata.txt
+
+python3 src/merge.py
+rm sizedata.txt varsymtab.txt funcsymtab.txt
+mv initdata.txt instrfile.txt src

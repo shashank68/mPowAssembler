@@ -1,14 +1,1 @@
-cp $1 assem.asm
-./linescript.sh assem.asm 
-lex varpass.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
-./linerem assem.asm
-lex funcpass.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
-lex mPowAssemb.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
-rm assem.asm assem.asm.orig linedet.txt
-wc -l instrfile.txt | cut -f1 -d" " > sizedata.txt
-wc -l initdata.txt | cut -f1 -d" " >> sizedata.txt
-wc -l funcsymtab.txt | cut -f1 -d" " >> sizedata.txt
-wc -l varsymtab.txt | cut -f1 -d" " >> sizedata.txt
-
-python3 merge.py
-rm sizedata.txt
+./src/assemble $1

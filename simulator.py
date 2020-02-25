@@ -211,7 +211,7 @@ def print_special_regs():
 #reading the binary file functions.
 def read_data_segment():
     base = 0x0000000010000000
-    init_data = open('initdata.txt', 'r')
+    init_data = open('src/initdata.txt', 'r')
     line_list = init_data.readlines()
     for data in line_list:
         decode  = data.split()
@@ -232,7 +232,7 @@ def read_data_segment():
     init_data.close()
 
 def read_text_segment():
-    init_text = open('instrfile.txt', 'r')
+    init_text = open('src/instrfile.txt', 'r')
     inslist = init_text.readlines()
     global line
     #step count execution code of uPower assembly code.

@@ -2,7 +2,7 @@ filenames = ['instrfile.txt', 'initdata.txt', 'funcsymtab.txt', 'varsymtab.txt']
 ln = open('sizedata.txt', 'r')
 lidata = ln.readlines()
 
-with open('assembledbin.out', 'w') as outfile:
+with open('bin.out', 'w') as outfile:
     for size in lidata:
         n = size.strip()
         outfile.write(n[0] + " ")
