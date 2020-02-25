@@ -2,9 +2,14 @@
 X: .word 5
 .text
 main:
-    or 31, 31, 31
-    xorr 2,7,9
-    xorri 6,7,5
-        lab:
-    bca 3,4, lab
+    addi 5, 0, 8
+    addi 31, 0, 31
+    label:
+        addi  6, 0, 8
+        cmp 7, 1, 5, 6
+        beq 4, 30, label
+        bc 4, 30, label
+        bca 5, 23, label
+        
+
     
