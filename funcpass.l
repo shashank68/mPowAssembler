@@ -5,7 +5,6 @@
     #include<stdlib.h>
     #include<math.h>
     char functlabels[50][2][25];
-    char vardata[50][20][32];
     int functlabelcount = 0;
     int datanum[20];
     void convertbin(int , char*);
@@ -24,6 +23,8 @@ sitwopow14 [+-]?([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-7]
 sitwopow16 [+-]?([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[12][0-9]{4}|3[01][0-9]{3}|32[0-6][0-9]{2}|327[0-5][0-9]|3276[0-7])|"-32768"
 uitwopow16 ([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
 functname ([a-zA-Z_][a-zA-Z0-9_]*)
+lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
+
 
 %%
 "add"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
@@ -31,42 +32,36 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
 }
 "addi"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{sitwopow16}[ \n]+ {
     instrCount++;
-} 
+}
 "addis"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{sitwopow16}[ \n]+ {
    instrCount++;
 }
 "and"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
     instrCount++;
 }
-"subf"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
-    instrCount++;
-}  
 "andi"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{uitwopow16}[ \n]+ {
   instrCount++;
-} 
-"ori"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{uitwopow16}[ \n]+ {
-   instrCount++;
+}
+"extsw"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*[ ]*[ \n]+ {
+  instrCount++;
+}
+"nand"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+    instrCount++;
 }
 "or"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
     instrCount++;
 }
-"nand"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
-    instrCount++;
-} 
-"rlwinm"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+"ori"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{uitwopow16}[ \n]+ {
    instrCount++;
 }
-"sld"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
-    instrCount++;
-} 
-"srd"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
-   instrCount++;
-}
-"srad"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+"subf"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
     instrCount++;
 }
-"sradi"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
-    instrCount++;
+"xorr"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+  instrCount++;
+}
+"xorri"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{uitwopow16}[ \n]+ {
+  instrCount++;
 }
 "ld"[ ]+{reg}[ ]*,[ ]*{sitwopow14}\({reg}\)[ \n]+ {
     instrCount++;
@@ -98,6 +93,21 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
 "stb"[ ]+{reg}[ ]*,[ ]*{sitwopow16}\({reg}\)[ \n]+ {
     instrCount++;
 }
+"rlwinm"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+   instrCount++;
+}
+"sld"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+    instrCount++;
+}
+"srd"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+   instrCount++;
+}
+"srad"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+    instrCount++;
+}
+"sradi"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+    instrCount++;
+}
 "b"[ ]+{functname}[ \n]+ {
     instrCount++;
 }
@@ -110,6 +120,9 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
 "bc"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{functname}[ \n]+ {
     instrCount++;
 }
+"beq"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{functname}[ \n]+ {
+  instrCount++;
+}
 "bclr"[ \n]+ {
     instrCount++;
 }
@@ -117,7 +130,16 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
     instrCount++;
 }
 "la"[ ]+{reg}[ ]*,[ ]*{functname}[ \n]+ {
-    instrCount++;          
+    instrCount++;
+}
+"cmp"[ ]+"7"[ ]*,[ ]*"1"[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
+  instrCount++;
+}
+"cmpi"[ ]+"7"[ ]*,[ ]*"1"[ ]*,[ ]*{reg}[ ]*,[ ]*{sitwopow16}[ \n]+ {
+  instrCount++;
+}
+"sc"[ ]+{lev}[ \n]+ {
+  instrCount++;
 }
 {labelname}[ ]*\:[ \n]+ {
     int stringctrl = 0;
@@ -129,24 +151,29 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
             break;
         }
     }
-    
+
     char varName[count+1];
     for(int cnt = 0; cnt < count; cnt++) {
         varName[cnt] = temp[stringctrl+cnt];
     }
     varName[count] = 0;
     strcpy(functlabels[functlabelcount][0], varName);
-    strcpy(vardata[functlabelcount][0], varName); // name of label
     char addressInTextSec[17] = {0};
-    convertbincomp(functlabelcount * 4, addressInTextSec, 0);
+    convertbincomp(instrCount * 4, addressInTextSec, 0);
     strcpy(functlabels[functlabelcount][1], addressInTextSec);  // address
-    strcpy(vardata[functlabelcount][1], addressInTextSec);
 
     stringctrl += (count + 1);
-    
-    
+
+
     functlabelcount++;
-} 
+}
+
+\n {
+    ;
+}
+.* {
+    ;
+}
 
 %%
 
@@ -171,14 +198,14 @@ int main(int arc, char **argv) {
     }
     FILE* inputFile = fopen(argv[1], "r");
     yyin = inputFile;
-    
+
     FILE* funcSymTab = fopen("funcsymtab.txt", "w");
     yylex();
 
     for(int j = 0; j < functlabelcount; j++) {
         fprintf(funcSymTab, "%s %s\n", functlabels[j][0], functlabels[j][1]);
     }
-    
+
     fclose(inputFile);
     fclose(funcSymTab);
     // open 3 files for 2 for sym table and 1 initialed vaule
@@ -195,7 +222,7 @@ void convertbincomp(int n, char temp[], int negativeflag) {
         n = n / 2;
     }
     while(indx >= 0) {
-        temp[indx--] = lastdig + 48;          
+        temp[indx--] = lastdig + 48;
     }
 }
 
@@ -208,6 +235,6 @@ void convertbincomp32(long n, char temp[], int negativeflag) {
         n = n / 2;
     }
     while(indx >= 0) {
-        temp[indx--] = lastdig + 48;          
+        temp[indx--] = lastdig + 48;
     }
 }

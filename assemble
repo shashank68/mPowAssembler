@@ -5,5 +5,10 @@ lex varpass.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
 lex funcpass.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
 lex mPowAssemb.l && gcc lex.yy.c -lfl -lm && ./a.out assem.asm < linedet.txt
 rm assem.asm assem.asm.orig linedet.txt
-python3 merge.py
+wc -l instrfile.txt | cut -f1 -d" " > sizedata.txt
+wc -l initdata.txt | cut -f1 -d" " >> sizedata.txt
+wc -l funcsymtab.txt | cut -f1 -d" " >> sizedata.txt
+wc -l varsymtab.txt | cut -f1 -d" " >> sizedata.txt
 
+python3 merge.py
+rm sizedata.txt
