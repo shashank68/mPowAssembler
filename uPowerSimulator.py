@@ -246,7 +246,7 @@ def read_text_segment():
             count = len(inslist)
     else:
         count = len(inslist)
-
+    global deci_pc
     while(deci_pc < count):
         special_registers["pc"] = int(special_registers["pc"], 0)
         special_registers["pc"] = special_registers["pc"] + 4
