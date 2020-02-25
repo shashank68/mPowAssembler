@@ -5,7 +5,6 @@
     #include<stdlib.h>
     #include<math.h>
     char functlabels[50][2][25];
-    char vardata[50][20][32];
     int functlabelcount = 0;
     int datanum[20];
     void convertbin(int , char*);
@@ -24,6 +23,8 @@ sitwopow14 [+-]?([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-7]
 sitwopow16 [+-]?([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[12][0-9]{4}|3[01][0-9]{3}|32[0-6][0-9]{2}|327[0-5][0-9]|3276[0-7])|"-32768"
 uitwopow16 ([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])
 functname ([a-zA-Z_][a-zA-Z0-9_]*)
+lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
+
 
 %%
 "add"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{reg}[ \n]+ {
@@ -157,11 +158,9 @@ functname ([a-zA-Z_][a-zA-Z0-9_]*)
     }
     varName[count] = 0;
     strcpy(functlabels[functlabelcount][0], varName);
-    strcpy(vardata[functlabelcount][0], varName); // name of label
     char addressInTextSec[17] = {0};
-    convertbincomp(functlabelcount * 4, addressInTextSec, 0);
+    convertbincomp(instrCount * 4, addressInTextSec, 0);
     strcpy(functlabels[functlabelcount][1], addressInTextSec);  // address
-    strcpy(vardata[functlabelcount][1], addressInTextSec);
 
     stringctrl += (count + 1);
 

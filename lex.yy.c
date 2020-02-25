@@ -450,7 +450,7 @@ static const flex_int16_t yy_accept[1053] =
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,   11,    0,    0,    0,    0,
+        0,    0,    0,    0,    0,    8,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -466,7 +466,7 @@ static const flex_int16_t yy_accept[1053] =
         0,    0,    0,    0,    0,   13,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    8,    0,    0,    0,    0,    0,    0,    0,    0,
+        0,    9,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,   24,    0,    0,    0,    0,    0,    0,   25,
 
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -481,7 +481,7 @@ static const flex_int16_t yy_accept[1053] =
         0,    0,    0,   26,    0,    0,    0,    0,    0,   22,
 
        15,    0,   20,    0,   16,    0,    0,    0,    0,    0,
-        0,    0,    9,   10,    0,    0,    0,    0,    0,    0,
+        0,    0,   10,   11,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         3,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,   36,    0,    0,    0,    0,
@@ -2718,6 +2718,38 @@ YY_RULE_SETUP
 {
     char* temp = yytext;
 
+    char* opcode = "011111";
+    strcpy(instructionMatrix[instrCount], opcode);
+
+    int stringctrl = 3;
+
+    for(int count = 0; count < 3; count++) {
+        int  instrctrl = pos[count];
+        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
+            stringctrl++;
+        }
+        char binregnum[6] = {0};
+
+        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
+            convertbin((int)(temp[stringctrl]) - 48, binregnum);
+            stringctrl++;
+        } else{
+            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
+            stringctrl += 2;
+        }
+        strcat(instructionMatrix[instrCount], binregnum);
+    }
+    strcat(instructionMatrix[instrCount], "01101111000\n");
+    instrCount++;
+}
+	YY_BREAK
+case 9:
+/* rule 9 can match eol */
+YY_RULE_SETUP
+#line 331 "mPowAssemb.l"
+{
+    char* temp = yytext;
+
     char* opcode = "011000";
     strcpy(instructionMatrix[instrCount], opcode);
 
@@ -2761,10 +2793,10 @@ YY_RULE_SETUP
     instrCount++;
 }
 	YY_BREAK
-case 9:
-/* rule 9 can match eol */
+case 10:
+/* rule 10 can match eol */
 YY_RULE_SETUP
-#line 349 "mPowAssemb.l"
+#line 377 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -2794,10 +2826,10 @@ YY_RULE_SETUP
     instrCount++;
 }
 	YY_BREAK
-case 10:
-/* rule 10 can match eol */
+case 11:
+/* rule 11 can match eol */
 YY_RULE_SETUP
-#line 378 "mPowAssemb.l"
+#line 406 "mPowAssemb.l"
 {
         char* temp = yytext;
         for(int n = 0; n < 3; n++) {
@@ -2829,42 +2861,10 @@ YY_RULE_SETUP
         instrCount++;
     }
 	YY_BREAK
-case 11:
-/* rule 11 can match eol */
-YY_RULE_SETUP
-#line 410 "mPowAssemb.l"
-{
-    char* temp = yytext;
-
-    char* opcode = "011111";
-    strcpy(instructionMatrix[instrCount], opcode);
-
-    int stringctrl = 3;
-
-    for(int count = 0; count < 3; count++) {
-        int  instrctrl = pos[count];
-        while(temp[stringctrl] == ' ' || temp[stringctrl] == ',') {
-            stringctrl++;
-        }
-        char binregnum[6] = {0};
-
-        if(temp[stringctrl + 1] ==  ' ' || temp[stringctrl+1] == ',' || temp[stringctrl+1] == '\0' || temp[stringctrl+1] == '\n') {
-            convertbin((int)(temp[stringctrl]) - 48, binregnum);
-            stringctrl++;
-        } else{
-            convertbin( ((int)(temp[stringctrl]) - 48) * 10 + (int)temp[stringctrl + 1] - 48, binregnum);
-            stringctrl += 2;
-        }
-        strcat(instructionMatrix[instrCount], binregnum);
-    }
-    strcat(instructionMatrix[instrCount], "01101111000\n");
-    instrCount++;
-}
-	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 439 "mPowAssemb.l"
+#line 437 "mPowAssemb.l"
 {
         char* temp = yytext;
         for(int n = 0; n < 3; n++) {
@@ -2916,7 +2916,7 @@ YY_RULE_SETUP
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 487 "mPowAssemb.l"
+#line 485 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -2987,7 +2987,7 @@ YY_RULE_SETUP
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 554 "mPowAssemb.l"
+#line 552 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3058,7 +3058,7 @@ YY_RULE_SETUP
 case 15:
 /* rule 15 can match eol */
 YY_RULE_SETUP
-#line 621 "mPowAssemb.l"
+#line 619 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3129,7 +3129,7 @@ YY_RULE_SETUP
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 688 "mPowAssemb.l"
+#line 686 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3200,7 +3200,7 @@ YY_RULE_SETUP
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 755 "mPowAssemb.l"
+#line 753 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3271,7 +3271,7 @@ YY_RULE_SETUP
 case 18:
 /* rule 18 can match eol */
 YY_RULE_SETUP
-#line 822 "mPowAssemb.l"
+#line 820 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3342,7 +3342,7 @@ YY_RULE_SETUP
 case 19:
 /* rule 19 can match eol */
 YY_RULE_SETUP
-#line 889 "mPowAssemb.l"
+#line 887 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3413,7 +3413,7 @@ YY_RULE_SETUP
 case 20:
 /* rule 20 can match eol */
 YY_RULE_SETUP
-#line 956 "mPowAssemb.l"
+#line 954 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3484,7 +3484,7 @@ YY_RULE_SETUP
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 1023 "mPowAssemb.l"
+#line 1021 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3555,7 +3555,7 @@ YY_RULE_SETUP
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 1090 "mPowAssemb.l"
+#line 1088 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3626,7 +3626,7 @@ YY_RULE_SETUP
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 1157 "mPowAssemb.l"
+#line 1155 "mPowAssemb.l"
 {
         char* temp = yytext;
 
@@ -3660,7 +3660,7 @@ YY_RULE_SETUP
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 1187 "mPowAssemb.l"
+#line 1185 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3692,7 +3692,7 @@ YY_RULE_SETUP
 case 25:
 /* rule 25 can match eol */
 YY_RULE_SETUP
-#line 1215 "mPowAssemb.l"
+#line 1213 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3724,7 +3724,7 @@ YY_RULE_SETUP
 case 26:
 /* rule 26 can match eol */
 YY_RULE_SETUP
-#line 1243 "mPowAssemb.l"
+#line 1241 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3756,7 +3756,7 @@ YY_RULE_SETUP
 case 27:
 /* rule 27 can match eol */
 YY_RULE_SETUP
-#line 1271 "mPowAssemb.l"
+#line 1269 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3802,7 +3802,7 @@ YY_RULE_SETUP
 case 28:
 /* rule 28 can match eol */
 YY_RULE_SETUP
-#line 1313 "mPowAssemb.l"
+#line 1311 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3852,7 +3852,7 @@ YY_RULE_SETUP
 case 29:
 /* rule 29 can match eol */
 YY_RULE_SETUP
-#line 1359 "mPowAssemb.l"
+#line 1357 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3900,7 +3900,7 @@ YY_RULE_SETUP
 case 30:
 /* rule 30 can match eol */
 YY_RULE_SETUP
-#line 1403 "mPowAssemb.l"
+#line 1401 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -3948,7 +3948,7 @@ YY_RULE_SETUP
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 1447 "mPowAssemb.l"
+#line 1445 "mPowAssemb.l"
 {
     char* opcode = "01001100000000000000000000100000";
     strcpy(instructionMatrix[instrCount],opcode);
@@ -3958,7 +3958,7 @@ YY_RULE_SETUP
 case 32:
 /* rule 32 can match eol */
 YY_RULE_SETUP
-#line 1454 "mPowAssemb.l"
+#line 1451 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -4026,7 +4026,7 @@ YY_RULE_SETUP
 case 33:
 /* rule 33 can match eol */
 YY_RULE_SETUP
-#line 1518 "mPowAssemb.l"
+#line 1515 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -4094,7 +4094,7 @@ YY_RULE_SETUP
 case 34:
 /* rule 34 can match eol */
 YY_RULE_SETUP
-#line 1582 "mPowAssemb.l"
+#line 1579 "mPowAssemb.l"
 {
 
     char* temp = yytext;
@@ -4163,7 +4163,7 @@ YY_RULE_SETUP
 case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
-#line 1647 "mPowAssemb.l"
+#line 1644 "mPowAssemb.l"
 {
     char* temp = yytext;
 
@@ -4229,7 +4229,7 @@ YY_RULE_SETUP
 case 36:
 /* rule 36 can match eol */
 YY_RULE_SETUP
-#line 1709 "mPowAssemb.l"
+#line 1706 "mPowAssemb.l"
 {
         char* temp = yytext;
         char* opcode = "011111";
@@ -4267,7 +4267,7 @@ YY_RULE_SETUP
 case 37:
 /* rule 37 can match eol */
 YY_RULE_SETUP
-#line 1743 "mPowAssemb.l"
+#line 1740 "mPowAssemb.l"
 {
   char* temp = yytext;
   char* opcode = "001011";
@@ -4330,7 +4330,7 @@ YY_RULE_SETUP
 case 38:
 /* rule 38 can match eol */
 YY_RULE_SETUP
-#line 1802 "mPowAssemb.l"
+#line 1799 "mPowAssemb.l"
 {
   char* temp = yytext;
   char* opcode = "010001";
@@ -4362,7 +4362,7 @@ YY_RULE_SETUP
 case 39:
 /* rule 39 can match eol */
 YY_RULE_SETUP
-#line 1830 "mPowAssemb.l"
+#line 1827 "mPowAssemb.l"
 {
     ;
 }
@@ -4370,7 +4370,7 @@ YY_RULE_SETUP
 case 40:
 /* rule 40 can match eol */
 YY_RULE_SETUP
-#line 1834 "mPowAssemb.l"
+#line 1831 "mPowAssemb.l"
 {
     ;
 }
@@ -4378,14 +4378,14 @@ YY_RULE_SETUP
 case 41:
 /* rule 41 can match eol */
 YY_RULE_SETUP
-#line 1838 "mPowAssemb.l"
+#line 1835 "mPowAssemb.l"
 {
     ;
 }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 1843 "mPowAssemb.l"
+#line 1840 "mPowAssemb.l"
 ECHO;
 	YY_BREAK
 #line 4392 "lex.yy.c"
@@ -5405,7 +5405,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 1843 "mPowAssemb.l"
+#line 1840 "mPowAssemb.l"
 
 
 int main(int arc, char **argv) {
