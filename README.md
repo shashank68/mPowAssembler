@@ -10,3 +10,8 @@ Steps:
 
 Output binary is `bin.out`
 Symbol table and text section and static data section files are also generated.
+
+## Simulator.
+Requirements: Python3
+
+1. python3 simulator.py
