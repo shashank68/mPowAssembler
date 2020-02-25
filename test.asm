@@ -7,9 +7,8 @@ main:
     label:
         addi  6, 0, 8
         cmp 7, 1, 5, 6
-        beq 4, 30, label
-        bc 4, 30, label
-        bca 5, 23, label
+        
+        bca 5, 30, label
         
 
     

@@ -1,6 +1,7 @@
 line = ""
 deci_pc = 0
 numberOfInstructionExecution = 0
+infiniteloop = 0
 from math import pow
 
 #required tables and dictionaries.
@@ -257,6 +258,8 @@ def read_text_segment():
         numberOfInstructionExecution += 1
         if numberOfInstructionExecution > 1000:
             print("Infinite loop!!")
+            global infiniteloop
+            infiniteloop = 1
             return 0
     init_text.close()
 
@@ -271,6 +274,9 @@ def execute():
         print()
         read_data_segment()
         read_text_segment()
+        if infiniteloop == 1:
+            print("Infinite loop!!! Stopping execution.")
+            return
         print_register_data()
         print_data_table()
         print_special_regs()
@@ -278,3 +284,4 @@ def execute():
 if __name__ == '__main__':
     execute()
 #-------------------------------
+

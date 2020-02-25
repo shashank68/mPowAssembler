@@ -1,1 +1,1 @@
-./src/assemble $1
+./src/startassemble $1
