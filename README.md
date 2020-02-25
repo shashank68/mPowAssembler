@@ -14,4 +14,4 @@ Symbol table and text section and static data section files are also generated.
 ## Simulator.
 Requirements: Python3
 
-1. python3 simulator.py
+1. `python3 simulator.py`
