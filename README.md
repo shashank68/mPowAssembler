@@ -8,5 +8,5 @@ Steps:
 3. Change the directory: `cd mPowAssembler`
 4. Run the assembler: `./assemble <assembly file name>`       (for eg: `./assemble test.asm`)
 
-Output binary is `assembledbin.out`
+Output binary is `bin.out`
 Symbol table and text section and static data section files are also generated.
