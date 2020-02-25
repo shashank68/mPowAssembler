@@ -1,6 +1,6 @@
 line = ""
 deci_pc = 0
-
+numberOfInstructionExecution = 0
 from math import pow
 
 #required tables and dictionaries.
@@ -138,10 +138,10 @@ def SLDW():
 def Andi():
     register_table[get_decimal_value(line[6:11])] = register_table[get_decimal_value(line[11:16])] & get_two_complement_number(line[16:])
 
-def cmp():
+def Cmp():
     bf = get_decimal_value(line[6:9])
     l = int(line[10])
-    if bf == 7 && l == 1:
+    if bf == 7 and l == 1:
         a = register_table[get_decimal_value(line[11:16])]
         b = register_table[get_decimal_value(line[16:21])]
         if a < b:
@@ -155,16 +155,15 @@ def bca():
     bi = get_decimal_value(line[11:16])
     val = (get_decimal_value(line[16:30])//4)
     global deci_pc
-    if bi == 28 && special_registers['cr'][60] == '1':
+    if bi == 28 and special_registers['cr'][60] == '1':
         deci_pc = val
-    elif bi == 29 && special_registers['cr'][61] == '1':
+    elif bi == 29 and special_registers['cr'][61] == '1':
         deci_pc = val
-    elif bi == 30 && special_registers['cr'][62] == '1':
+    elif bi == 30 and special_registers['cr'][62] == '1':
         deci_pc = val
-
 #instruction dictionaries and detection function.
 XO = {266: add, 40: subf}
-X  = {476: Nand, 28: And, 444: Or, 539: SRDW, 27: SLDW, 0:cmp}
+X  = {476: Nand, 28: And, 444: Or, 539: SRDW, 27: SLDW, 0:Cmp}
 XS = {}
 get_instruction_from_pop = {14:addi, 58:load, 62:store, 24:Ori, 28:Andi, 32:lwz, 36:stw, 19:bca}
 
@@ -254,6 +253,11 @@ def read_text_segment():
         line = inslist[deci_pc][:32]
         compute_instruction()
         deci_pc +=1
+        global numberOfInstructionExecution
+        numberOfInstructionExecution += 1
+        if numberOfInstructionExecution > 1000:
+            print("Infinite loop!!")
+            return 0
     init_text.close()
 
 #wrapper function.
