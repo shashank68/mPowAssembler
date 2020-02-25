@@ -1497,11 +1497,8 @@ lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
 
     if(found == 1) {
         char addr[15] = {0};
-        int diff = funcaddress[funclabelcount] - (instrCount * 4 + 262144);
-        if(diff >= 0) {
-            convertbin14comp(diff, addr, 0);
-        } else {
-            convertbin14comp(-1*diff, addr, 1);
+        for(int i = 0; i < 14; i++) {
+            addr[i] = funclabels[funclabelcount - 1][1][i+2];
         }
         strcat(instructionMatrix[instrCount], addr);
         strcat(instructionMatrix[instrCount], "00\n");
@@ -1561,11 +1558,8 @@ lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
 
     if(found == 1) {
         char addr[15] = {0};
-        int diff = funcaddress[funclabelcount] - (instrCount * 4 + 262144);
-        if(diff >= 0) {
-            convertbin14comp(diff, addr, 0);
-        } else {
-            convertbin14comp(-1*diff, addr, 1);
+        for(int i = 0; i < 14; i++) {
+            addr[i] = funclabels[funclabelcount - 1][1][i+2];
         }
         strcat(instructionMatrix[instrCount], addr);
         strcat(instructionMatrix[instrCount], "00\n");
