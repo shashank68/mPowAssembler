@@ -1498,7 +1498,7 @@ lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
     if(found == 1) {
         char addr[15] = {0};
         for(int i = 0; i < 14; i++) {
-            addr[i] = funclabels[funclabelcount - 1][1][i+2];
+            addr[i] = funclabels[j][1][i+2];
         }
         strcat(instructionMatrix[instrCount], addr);
         strcat(instructionMatrix[instrCount], "00\n");
@@ -1559,7 +1559,7 @@ lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
     if(found == 1) {
         char addr[15] = {0};
         for(int i = 0; i < 14; i++) {
-            addr[i] = funclabels[funclabelcount - 1][1][i+2];
+            addr[i] = funclabels[j][1][i+2];
         }
         strcat(instructionMatrix[instrCount], addr);
         strcat(instructionMatrix[instrCount], "00\n");
@@ -1620,7 +1620,7 @@ lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
     if(found == 1) {
         char addr[15] = {0};
         for(int i = 0; i < 14; i++) {
-            addr[i] = funclabels[funclabelcount - 1][1][i+2];
+            addr[i] = funclabels[j][1][i+2];
         }
         strcat(instructionMatrix[instrCount], addr);
         strcat(instructionMatrix[instrCount], "10\n");
