@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-
-"""
-To be Done:
-    1) System Call for printing a string.
-    2) Global Pointer now accessible(Test to be done).
-    3) P1, P2, P3, P4 to be executed and tested 
-"""
-
 line = ""
 deci_pc = 0
 numberOfInstructionExecution = 0
@@ -21,11 +13,12 @@ register_table = []  #register table definition
 for i in range(0,32):
     register_table.append(0)
 #initializing global pointer.
-register_table[28] = int('0x0000003feffffff0', 0)
-register_table[29] = int('0x0000000000008000', 0)
+register_table[28] = int('0x0000000000008000', 0)
+register_table[29] = int('0x0000003feffffff0', 0)
 
 data_table = {} #data table definition
 special_registers = {"pc": '0x0000000000400000', 'sp': '0x0000003ffffffff0', 'cr': "{:064b}".format(0), 'gp': '0x0000000010008000'}
+string_table = {}
 
 #convertion functions and overflow check functions.
 def get_decimal_value(binary_value):
@@ -171,16 +164,27 @@ def bca():
     if bi == 28 and special_registers['cr'][60] == '1':
         deci_pc = val
     elif bi == 29 and special_registers['cr'][61] == '1':
-        print("YOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
         deci_pc = val
     elif bi == 30 and special_registers['cr'][62] == '1':
         deci_pc = val
+
+#system call.
+def syscall():
+    lev = get_decimal_value(line[20:27])
+    if line[30] == '1' and lev == 4:
+        base_addr = 0x0000000010000000
+        register_table[18] = register_table[18] + base_addr
+        base_address = "0x{:016x}".format(register_table[18])
+        if base_address in string_table.keys():
+            print(string_table[base_address])
+        else:
+            print("")
 
 #instruction dictionaries and detection function.
 XO = {266: add, 40: subf}
 X  = {476: Nand, 28: And, 444: Or, 539: SRDW, 27: SLDW, 0:Cmp}
 XS = {}
-get_instruction_from_pop = {14:addi, 58:load, 62:store, 24:Ori, 28:Andi, 32:lwz, 36:stw, 19:bca}
+get_instruction_from_pop = {14:addi, 58:load, 62:store, 24:Ori, 28:Andi, 32:lwz, 36:stw, 19:bca, 17:syscall}
 
 #instruction detection function.
 def compute_instruction():
@@ -203,7 +207,7 @@ def compute_instruction():
             print("Instruction Error");
 
 def get_pc_value(curr_decipc):
-    special_registers['pc'] = "0x{:016x}".format(special_registers['pc'] + (4*(curr_decipc+1)))
+    special_registers['pc'] = "0x{:016x}".format(int('0x0000000000400000',0) + (4*(curr_decipc+1)))
     print("PC: ", special_registers['pc'])
 #printing the memory state functions.
 def print_register_data():
@@ -235,18 +239,23 @@ def read_data_segment():
         decode  = data.split()
         address = decode[1]
         type_of_data = decode[2]
-        no_of_data_in_line = get_decimal_value(decode[3])
+        no_of_data_in_line = len(decode[4:])
+        next_addr = base + get_decimal_value(address)
         if type_of_data == '11':
             offset = 1
         elif type_of_data == '01':
             offset = 4
         elif type_of_data == '10':
             offset = 1
-        next_addr = base + get_decimal_value(address)
+            base = "0x{:016x}".format(next_addr)
+            string_table[base] = ""
         for i in range(0, no_of_data_in_line):
             type_table[type_of_data].append("0x{:016x}".format(next_addr))
-            data_table["0x{:016x}".format(next_addr)] = decode[4 + i]
-            next_addr = base + get_decimal_value(address) + offset
+            data_table["0x{:016x}".format(next_addr)] = decode[4+i]
+            if type_of_data == '10':
+                string_table[base] += decode[4+i]
+                string_table[base] += " "
+            next_addr = next_addr + get_decimal_value(address) + offset
     init_data.close()
 
 def read_text_segment():
@@ -268,7 +277,7 @@ def read_text_segment():
         count = len(inslist)
     global deci_pc
     while(deci_pc < count):
-        #get_pc_value()
+        get_pc_value(deci_pc)
         line = inslist[deci_pc][:32]
         compute_instruction()
         deci_pc += 1
@@ -291,6 +300,21 @@ def read_text_segment():
             return 0
     init_text.close()
 
+def create_dump_values(comment = ""):
+    fp = open('src/val_dump.txt', 'w')
+    fp.write(comment + "\n")
+    fp.write("Note: Registers store the address in the form of offset w.r.t to 0x0000000010000000\n")
+    fp.write("Register Contents:\n")
+    for i in range(0, 32):
+        fp.write("Reg[{}]: {:064b}({})\n".format(i, register_table[i], register_table[i]))
+    fp.write("Memory Contents of locations used by process:\n")
+    for i in list(data_table.keys()):
+        fp.write("Address: "+i+" has Value: "+data_table[i]+"\n")
+    fp.write("Final Special Register Contents: \n")
+    fp.write("Program Counter: " + special_registers['pc'] + "\n")
+    fp.write("Stack Pointer: " + special_registers['sp'] + "\n")
+    fp.write("Global Pointer: " + special_registers['gp'] + "\n")
+    fp.write("#-----------------------------------------------------------------------------------------------------------------------------------------------------------\n")
 #wrapper function.
 def execute():
         print("Initially: ")
@@ -306,6 +330,10 @@ def execute():
         print_register_data()
         print_data_table()
         print_special_regs()
+        print("Want the data in a txt file?[Y/n]")
+        ans = input()
+        if ans != 'n':
+            create_dump_values("Final Data Contents")
 
 if __name__ == '__main__':
     execute()
