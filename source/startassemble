@@ -12,6 +12,6 @@ wc -l initdata.txt | cut -f1 -d" " >> sizedata.txt
 wc -l funcsymtab.txt | cut -f1 -d" " >> sizedata.txt
 wc -l varsymtab.txt | cut -f1 -d" " >> sizedata.txt
 
-./src/merge
+python3 src/merge.py
 rm sizedata.txt  varsymtab.txt funcsymtab.txt
 mv initdata.txt instrfile.txt src

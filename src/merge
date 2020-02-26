@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 filenames = ['instrfile.txt', 'initdata.txt', 'funcsymtab.txt', 'varsymtab.txt']
 ln = open('sizedata.txt', 'r')
 lidata = ln.readlines()
