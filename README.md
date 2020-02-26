@@ -16,5 +16,5 @@ Symbol table and text section and static data section files can also be generate
 Requirements: python3
 
 Steps:
-1. Run `python3 simulator.py` inside mPowAssembler directory. ( after running assembler )
+1. Run `./simulator` inside mPowAssembler directory. ( after running assembler )
  
