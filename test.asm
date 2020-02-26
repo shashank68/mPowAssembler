@@ -2,13 +2,12 @@
 X: .word 5
 .text
 main:
-    addi 5, 0, 8
-    addi 31, 0, 31
+    addi 6, 0, 8
+    addi 5, 0, 10
     label:
-        addi  6, 0, 8
-        cmp 7, 1, 5, 6
-        
-        bca 5, 30, label
+        cmp 7, 1, 6, 5
+        addi 6, 6, 1
+        bca 5, 29, label
         
 
     
