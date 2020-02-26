@@ -1,19 +1,29 @@
+"""
+To be Done:
+    1) System Call for printing a string.
+    2) Global Pointer now accessible(Test to be done).
+    3) P1, P2, P3, P4 to be executed and tested 
+"""
+
 line = ""
 deci_pc = 0
 numberOfInstructionExecution = 0
 infiniteloop = 0
+
 from math import pow
 
 #required tables and dictionaries.
 type_table = {'01':[], '10':[], '11':[]}
 #memory table definition
 register_table = []  #register table definition
-
 for i in range(0,32):
     register_table.append(0)
+#initializing global pointer.
+register_table[28] = int('0x0000003feffffff0', 0)
+register_table[29] = int('0x0000000000008000', 0)
 
 data_table = {} #data table definition
-special_registers = {"pc": '0x0000000000400000', 'sp': '0x0000003ffffffff0', 'cr': "{:064b}".format(0)}
+special_registers = {"pc": '0x0000000000400000', 'sp': '0x0000003ffffffff0', 'cr': "{:064b}".format(0), 'gp': '0x0000000010008000'}
 
 #convertion functions and overflow check functions.
 def get_decimal_value(binary_value):
@@ -146,22 +156,24 @@ def Cmp():
         a = register_table[get_decimal_value(line[11:16])]
         b = register_table[get_decimal_value(line[16:21])]
         if a < b:
-            special_registers['cr'] = "{:064b}".format(8)
-        elif a > b:
             special_registers['cr'] = "{:064b}".format(4)
+        elif a > b:
+            special_registers['cr'] = "{:064b}".format(8)
         else:
             special_registers['cr'] = "{:064b}".format(2)
 
 def bca():
     bi = get_decimal_value(line[11:16])
-    val = (get_decimal_value(line[16:30])//4)
+    val = (get_decimal_value(line[16:30])//4)-1
     global deci_pc
     if bi == 28 and special_registers['cr'][60] == '1':
         deci_pc = val
     elif bi == 29 and special_registers['cr'][61] == '1':
+        print("YOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
         deci_pc = val
     elif bi == 30 and special_registers['cr'][62] == '1':
         deci_pc = val
+
 #instruction dictionaries and detection function.
 XO = {266: add, 40: subf}
 X  = {476: Nand, 28: And, 444: Or, 539: SRDW, 27: SLDW, 0:Cmp}
@@ -188,6 +200,9 @@ def compute_instruction():
         else:
             print("Instruction Error");
 
+def get_pc_value(curr_decipc):
+    special_registers['pc'] = "0x{:016x}".format(special_registers['pc'] + (4*(curr_decipc+1)))
+    print("PC: ", special_registers['pc'])
 #printing the memory state functions.
 def print_register_data():
     print("Register contents:")
@@ -233,6 +248,7 @@ def read_data_segment():
     init_data.close()
 
 def read_text_segment():
+    prev_pc = special_registers['pc']
     init_text = open('src/instrfile.txt', 'r')
     inslist = init_text.readlines()
     global line
@@ -250,12 +266,10 @@ def read_text_segment():
         count = len(inslist)
     global deci_pc
     while(deci_pc < count):
-        special_registers["pc"] = int(special_registers["pc"], 0)
-        special_registers["pc"] = special_registers["pc"] + 4
-        special_registers["pc"] = "0x{:016x}".format(special_registers["pc"])
+        #get_pc_value()
         line = inslist[deci_pc][:32]
         compute_instruction()
-        deci_pc +=1
+        deci_pc += 1
         global numberOfInstructionExecution
         numberOfInstructionExecution += 1
         if get_info == 3:
@@ -282,11 +296,9 @@ def execute():
         print()
         print("Under execution...")
         print()
+        print()
         read_data_segment()
         read_text_segment()
-        if infiniteloop == 1:
-            print("Infinite loop detected!!! Stopping execution.")
-            return
         print_register_data()
         print_data_table()
         print_special_regs()
@@ -294,4 +306,3 @@ def execute():
 if __name__ == '__main__':
     execute()
 #-------------------------------
-
