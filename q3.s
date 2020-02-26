@@ -4,6 +4,6 @@
 	.text
 main:
 
-	la $a0,str		#loading string into register
-	
+	la 18,str		#loading string into register
+	sc 4
 	.end
