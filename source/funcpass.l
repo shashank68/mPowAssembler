@@ -126,7 +126,7 @@ lev ([0-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-7])
 "bclr"[ \n]+ {
     instrCount++;
 }
-"bca"[ ]+{functname}[ \n]+ {
+"bca"[ ]+{reg}[ ]*,[ ]*{reg}[ ]*,[ ]*{functname}[ \n]+ {
     instrCount++;
 }
 "la"[ ]+{reg}[ ]*,[ ]*{functname}[ \n]+ {

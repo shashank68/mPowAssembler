@@ -1,13 +1,20 @@
-.data 
-X: .word 5
+.data
+
 .text
 main:
-    addi 6, 0, 8
-    addi 5, 0, 10
-    label:
-        cmp 7, 1, 6, 5
-        addi 6, 6, 1
-        bca 5, 29, label
-        
+addi 4, 0, 100
+label:
+addi 5,5,21
+cmp 7,1,4,5
+bca 0,28,label
+addi 6,0,10
+X:
+addi 10,10,19
+cmp 7,1,4,10
+bca 0,28,X
+addi 7,0,20
+
+
+ 
 
     
