@@ -1,9 +1,20 @@
-Required:
-1) instrfile.txt
-2) initdata.txt
+# Assembler for microPower Isa.
 
-Run:
-1) python3 uPowerSimulator.py
-2) select 1 or 2 or 3 as required.
-3) if 2 selected then enter instruction count.
-For stepwise exection, press 1 to step into next instruction.
+Requirements: Linux, Flex.
+
+Steps:
+1. Install Flex : `sudo apt install flex`
+2. Clone the Repo: `git clone https://github.com/shashank68/mPowAssembler.git`
+3. Change the directory: `cd mPowAssembler`
+4. Run the assembler: `./assemble <assembly file name>`       (for eg: `./assemble test.asm`)
+
+Output binary is `bin.out`
+Symbol table and text section and static data section files can also be generated.
+
+# Simulator for microPower Isa instructions.
+
+Requirements: python3
+
+Steps:
+1. Run `python3 simulator.py` inside mPowAssembler directory. ( after running assembler )
+ 
