@@ -276,9 +276,11 @@ def read_text_segment():
             print_register_data()
             print_data_table()
             print_special_regs()
-            step = input("1. Step.\n2. Finish execution.\n")
+            step = int(input("1. Step.\n2. Finish all instructions.\n3. Exit.\n"))
             if step == 2:
-                return 0
+                get_info = 1
+            elif step == 3:
+                exit(0)
 
         if numberOfInstructionExecution > 1000:
             print("Infinite loop!!")
