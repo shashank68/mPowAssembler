@@ -3,6 +3,7 @@
 Requirements: Linux, flex (only for compilation).
 
 Steps:
+
 0. Install Flex (only for compilation): `sudo apt install flex`  (optional)
 1. Clone the Repo: `git clone https://github.com/shashank68/mPowAssembler.git`
 2. Change the directory: `cd mPowAssembler`
