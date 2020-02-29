@@ -1,6 +1,6 @@
 # Assembler for microPower Isa.
 
-Requirements: Linux, flex (only for compilation).
+Requirements: *nix like OS, flex (only for compilation).
 
 Steps:
 
