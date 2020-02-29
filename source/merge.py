@@ -5,7 +5,7 @@ lidata = ln.readlines()
 with open('assembledbin.out', 'w') as outfile:
     for size in lidata:
         n = size.strip()
-        outfile.write(n[0] + " ")
+        outfile.write(n + " ")
     outfile.write("\n")
     for fname in filenames:
         with open(fname) as infile:
